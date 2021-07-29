@@ -1,0 +1,124 @@
+---
+swagger: "2.0"
+info:
+  description: "This is the api server for wedding-site."
+  version: ".1"
+  title: "Wedding Site Backend"
+  license:
+    name: "GNU GPLv3"
+    url: "https://www.gnu.org/licenses/gpl-3.0.en.html"
+host: "api.wedding-site.com"
+basePath: "/v1"
+tags:
+- name: "Invite"
+  description: "Everything about the Invite"
+- name: "Answers"
+  description: "Answers to questions from your guests"
+schemes:
+- "https"
+- "http"
+paths:
+  /answers/{code}:
+    post:
+      tags:
+      - "Answers"
+      summary: "Saves Answers to questions"
+      description: ""
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "code"
+        in: "path"
+        description: "Unique code for Invite"
+        required: true
+        type: "string"
+      - in: "body"
+        name: "body"
+        description: "answers to questions"
+        required: true
+        schema:
+          $ref: "#/definitions/Answers"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/ApiResponse"
+        404:
+          description: "not found"
+          schema:
+            $ref: "#/definitions/ApiResponse"
+
+  /invite/{code}:
+    get:
+      tags:
+      - "Invite"
+      summary: "Finds Pets by status"
+      description: "Multiple status values can be provided with comma separated strings"
+      operationId: "findPetsByStatus"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "code"
+        in: "path"
+        description: "Unique code for Invite"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Invite"
+        404:
+          description: "Invalid status value"
+
+definitions:
+  ApiResponse:
+    type: "object"
+    properties:
+      code:
+        type: "integer"
+        format: "int32"
+      type:
+        type: "string"
+      message:
+        type: "string"
+  Guest:
+    type: "object"
+    properties:
+      name:
+        type: "string"
+      attending:
+        type: "boolean"
+  Answer:
+    type: "object"
+    properties:
+      questionName:
+        type: "string"
+
+  Invite:
+    type: "object"
+    required:
+    - "email"
+    - "confirmed"
+    properties:
+      email:
+        type: "string"
+      language:
+        type: "string"
+        example: "en"
+      confirmed:
+        type: "boolean"
+      list:
+        type: "array"
+        items: 
+          $ref: "#/definitions/Guest"
+
+  Answers:
+    type: "array"
+    items: 
+      $ref: "#/definitions/Answer"
+

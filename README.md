@@ -1,0 +1,1 @@
+1) Copy .env_sample to .env

@@ -1,0 +1,50 @@
+version: '3.8'
+
+services: 
+  traefik:
+    ports:
+      - "8080:8080"
+  app:
+    command: npm run startDev
+    volumes: 
+      - /app/node_modules
+      - ./app:/app/
+    ports: 
+      - 9229:9229
+
+  db:
+    image: mysql:5.7
+    depends_on: 
+      - app
+    volumes:
+      - db_data:/var/lib/mysql
+    env_file:
+      - .env
+  adminer:
+    image: adminer
+    environment: 
+      - ADMINER_DEFAULT_SERVER=db
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.adminer.rule=PathPrefix(`/adminer/`,`/adminer`)"
+      - "traefik.http.middlewares.adminer-stripprefix.stripprefix.prefixes=/adminer,/adminer/"
+      - "traefik.http.routers.adminer.middlewares=adminer-stripprefix@docker"
+      - "traefik.http.routers.adminer.entrypoints=web"
+      - "traefik.http.services.adminer.loadbalancer.server.port=8080"
+  swagger:
+    image: swaggerapi/swagger-editor
+    volumes: 
+      - ./swagger.yml:/swagger.yml
+    environment: 
+      - SWAGGER_FILE=/swagger.yml
+    ports: 
+      - 8085:8080
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.swagger.rule=PathPrefix(`/swagger/`,`/swagger.yml`)"
+      - "traefik.http.middlewares.swagger-stripprefix.stripprefix.prefixes=/swagger/"
+      - "traefik.http.routers.swagger.middlewares=swagger-stripprefix@docker"
+      - "traefik.http.routers.swagger.entrypoints=web"
+      - "traefik.http.services.swagger.loadbalancer.server.port=8080"
+volumes: 
+  db_data:
