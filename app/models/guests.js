@@ -15,7 +15,8 @@ module.exports = (sequelize, DataTypes) => {
   };
   Guests.init({
     inviteId: DataTypes.INTEGER,
-    attending: DataTypes.BOOLEAN
+    attending: DataTypes.BOOLEAN,
+    name: DataTypes.STRING
   }, {
     sequelize,
     modelName: 'Guests',

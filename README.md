@@ -3,3 +3,7 @@
 
 
 `npx sequelize-cli db:seed:all` to import
+
+
+TODO:
+ - Log all requests
