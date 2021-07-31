@@ -1,3 +1,4 @@
 .env
 app/node_modules/
-app/import/
+app/import/guests.csv
+app/import/parties.csv
