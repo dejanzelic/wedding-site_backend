@@ -15,6 +15,7 @@ services:
   app:
     build: ./
     image: backend
+    restart: always
     stdin_open: true
     tty: true
     labels:

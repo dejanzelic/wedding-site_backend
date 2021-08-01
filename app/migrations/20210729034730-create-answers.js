@@ -17,17 +17,11 @@ module.exports = {
           },
         },
       },
-      response: {
-        type: Sequelize.STRING
+      answer: {
+        type: Sequelize.TEXT
       },
-      questionId: {
-        type: Sequelize.INTEGER,
-        references: {
-          model: {
-            tableName: 'Questions',
-            key: 'id'
-          },
-        },
+      name: {
+        type: Sequelize.STRING
       },
       createdAt: {
         allowNull: false,

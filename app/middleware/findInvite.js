@@ -7,21 +7,31 @@ module.exports = function (router) {
 				code: req.params.inviteCode
 			}
 		}).then(invite => {
-			req.invite = invite
-			model.Guests.findAll({
-				where: {
-					inviteId: invite.id
-				}
-			}).then(guests => {
-				req.guests = guests
-				next()
-			})
+			if (invite) {
+				req.invite = invite
+				model.Guests.findAll({
+					where: {
+						inviteId: invite.id
+					}
+				}).then(guests => {
+					req.guests = guests
+					next()
+				}).catch(err => {
+					err.code = 404;
+					err.type = "DB_ERROR"
+					err.customMessage = "Something went wrong querying for guests in party"
+					next(err)
+				})
+			} else {
+				err = new Error()
+				err.code = 404;
+				err.type = "NOT_FOUND"
+				err.customMessage = "Invite Code was not found"
+				next(err)
+			}
 		}).catch(err => {
-			res.status(404).send([{
-				code: 404,
-				type: "NOT_FOUND",
-				message: "Invite Code was not found"
-			}]);
+			err.code = 500;
+			next(err)
 		})
 	});
 }

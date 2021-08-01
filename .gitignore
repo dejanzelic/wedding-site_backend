@@ -2,3 +2,4 @@
 app/node_modules/
 app/import/guests.csv
 app/import/parties.csv
+*.log

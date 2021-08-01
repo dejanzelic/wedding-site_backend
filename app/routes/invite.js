@@ -22,62 +22,58 @@ router.put('/:inviteCode', function (req, res, next) {
   guests = req.guests
   err = [];
   if (!req.body.email) {
-    err.push({
-      code: 500,
-      type: "MISSING_PARAM",
-      message: "The 'email' paramater is missing"
-    })
+    err = new Error()
+    err.code = 500;
+    err.type = "MISSING_PARAM"
+    err.customMessage = "The 'email' paramater is missing"
+    return next(err)
   }
   if (!req.body.list) {
-    err.push({
-      code: 500,
-      type: "MISSING_PARAM",
-      message: "The 'list' paramater is missing"
-    })
+    err = new Error()
+    err.code = 500;
+    err.type = "MISSING_PARAM"
+    err.customMessage = "The 'list' paramater is missing"
+    return next(err)
   } else if (!Array.isArray(req.body.list)) {
-    err.push({
-      code: 500,
-      type: "INCORRECT_PARAM",
-      message: "Incorrect property type. List is expected to be an Array"
-    });
+    err = new Error()
+    err.code = 500;
+    err.type = "INCORRECT_PARAM"
+    err.customMessage = "Incorrect property type. List is expected to be an Array"
+    return next(err)
   } else if (req.body.list.length !== guests.length) {
-    err.push({
-      code: 500,
-      type: "INCORRECT_LENGTH",
-      message: "Guest length not as expected"
-    });
+    err = new Error()
+    err.code = 500;
+    err.type = "INCORRECT_LENGTH"
+    err.customMessage = "Guest length not as expected"
+    return next(err)
   } else {
     req.body.list.forEach(g => {
       if (typeof g.attending !== "boolean") {
-        err.push({
-          code: 500,
-          type: "INCORRECT_PARAM",
-          message: "attending is not a Boolean"
-        });
+        err = new Error()
+        err.code = 500;
+        err.type = "INCORRECT_PARAM"
+        err.customMessage = "attending is not a Boolean"
+        return next(err)
       }
     })
   }
 
-  if (err.length > 0){
-    res.status(500).send(err)
-  }else {
-    invite.email = req.body.email
-    invite.confirmed = true
-    invite.save().then(() => {
-      req.body.list.forEach((g, i) => {
-        guests[i].name = g.name
-        guests[i].attending = g.attending
-        // I'm sure theres a better way then to save for each guest.
-        guests[i].save().then(() => {
-          res.send({
-            code: 200,
-            type: "UPDATED",
-            message: "Invite was udpated"
-          })
+  invite.email = req.body.email
+  invite.confirmed = true
+  invite.save().then(() => {
+    req.body.list.forEach((g, i) => {
+      guests[i].name = g.name
+      guests[i].attending = g.attending
+      // I'm sure theres a better way then to save for each guest.
+      guests[i].save().then(() => {
+        res.send({
+          code: 200,
+          type: "SUCCESS",
+          message: "Invite was udpated"
         })
-      });
-    })
-  }
+      })
+    });
+  })
 });
 
 module.exports = router;

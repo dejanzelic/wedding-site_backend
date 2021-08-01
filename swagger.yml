@@ -45,10 +45,14 @@ paths:
           description: "successful operation"
           schema:
             $ref: "#/definitions/ApiResponse"
+        500:
+          description: "error"
+          schema:
+            $ref: "#/definitions/Error"
         404:
           description: "not found"
           schema:
-            $ref: "#/definitions/ApiResponse"
+            $ref: "#/definitions/Error"
 
   /invite/{code}:
     get:
@@ -75,7 +79,7 @@ paths:
         404:
           description: "not found"
           schema:
-            $ref: "#/definitions/ApiResponse"
+            $ref: "#/definitions/Error"
     put:
       tags:
       - "Invite"
@@ -108,13 +112,17 @@ paths:
         500:
           description: "error"
           schema:
-            $ref: "#/definitions/ApiResponse"
+            $ref: "#/definitions/Error"
         404:
           description: "not found"
           schema:
-            $ref: "#/definitions/ApiResponse"
+            $ref: "#/definitions/Error"
 
 definitions:
+  Error:
+    type: "array"
+    items: 
+      $ref: "#/definitions/ApiResponse"
   ApiResponse:
     type: "object"
     properties:
@@ -135,7 +143,9 @@ definitions:
   Answer:
     type: "object"
     properties:
-      questionName:
+      name:
+        type: "string"
+      answer:
         type: "string"
 
   Invite:
