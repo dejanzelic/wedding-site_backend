@@ -17,7 +17,6 @@ router.get('/:inviteCode', function (req, res, next) {
 });
 
 router.put('/:inviteCode', function (req, res, next) {
-  // TODO log all errors
   invite = req.invite
   guests = req.guests
   err = [];

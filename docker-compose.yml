@@ -13,11 +13,11 @@ services:
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
   app:
-    build: ./
-    image: backend
+    image: dejandayoff/wedding-backend
     restart: always
-    stdin_open: true
-    tty: true
+    env_file: .env
+    volumes: 
+      - ./app/logs:/app/logs
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.backend.rule=PathPrefix(`/v1/`)"

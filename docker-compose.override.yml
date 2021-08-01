@@ -5,6 +5,10 @@ services:
     ports:
       - "8080:8080"
   app:
+    image: dejandayoff/wedding-backend:dev
+    build:
+      context: ./
+      target: dev
     command: npm run startDev
     volumes: 
       - /app/node_modules

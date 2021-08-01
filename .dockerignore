@@ -1,0 +1,5 @@
+.env
+.env_sample
+app/import/*
+app/logs/*
+app/node_modules

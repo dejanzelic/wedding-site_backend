@@ -4,6 +4,7 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var cors = require('cors')
 var fs = require('fs')
+const errorToSlack = require('express-error-slack')
 
 var inviteRouter = require('./routes/invite');
 var answersRouter = require('./routes/answers');
@@ -15,7 +16,7 @@ var errorLogStream = fs.createWriteStream(path.join(__dirname, '/logs/error.log'
 
 logger.token('body', (req, res) => JSON.stringify(req.body))
 logger.token('error', (req, res) => JSON.stringify(res.errBody))
-logger.token('stack', (req, res) => res.errStack ? res.errStack  : "")
+logger.token('stack', (req, res) => res.errStack ? res.errStack : "")
 
 var app = express();
 
@@ -24,7 +25,7 @@ app.use(cors({
 	optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
 }))
 app.use(logger('dev'));
-app.use(logger(':method :url :status :response-time ms - :res[content-length] :body',
+app.use(logger(':remote-addr - :remote-user [:date[clf]] ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent" :body',
 	{
 		stream: accessLogStream,
 		skip: (req, res) => req.baseUrl === '/v1/healthcheck'
@@ -45,6 +46,11 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/v1/invite', inviteRouter);
 app.use('/v1/answers', answersRouter);
 app.use('/v1/healthcheck', healthRouter);
+
+if (process.env.SLACK_WEBHOOK_TOKEN) {
+	app.use(errorToSlack({ webhookUri: 'https://hooks.slack.com/services/' + process.env.SLACK_WEBHOOK_TOKEN }))
+}
+
 app.use(function (err, req, res, next) {
 	console.error(err.stack)
 	err.code = err.code ? err.code : 500
@@ -53,9 +59,9 @@ app.use(function (err, req, res, next) {
 		type: err.type ? err.type : "GENERIC_ERROR",
 		message: err.customMessage ? err.customMessage : "Something went wrong"
 	}
-	if (process.env.NODE_ENV !== "production"){
+	if (process.env.NODE_ENV !== "production") {
 		body.details = err.stack
-	}else{
+	} else {
 		res.errStack = err.stack
 	}
 	res.errBody = body
