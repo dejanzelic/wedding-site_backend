@@ -16,8 +16,11 @@ const getCSV = function (file) {
 const getParties = function () {
   return new Promise(async (resolve, reject) => {
     await getCSV('parties').then(async data => {
+      // Weird bug where the first line of the import isn't read propery
+      let id = Object.keys(data[0])[0]
+
       resolve(data.map(parties => ({
-        id: parties["RSVP ID"],
+        id: parties[id],
         code: parties["Phone"],
         confirmed: false,
         email: parties["Email"],
@@ -32,9 +35,10 @@ const getParties = function () {
 const getGuests = function () {
   return new Promise(async (resolve, reject) => {
     await getCSV('guests').then(async data => {
-
+      // Weird bug where the first line of the import isn't read propery
+      let id = Object.keys(data[0])[0]
       resolve(data.map(guests => ({
-        inviteId: guests["RSVP ID"],
+        inviteId: guests[id],
         attending: ((guests["Response"] === "Awaiting RSVP") ? null : (guests["Response"] === "Attending")),
         name: (
           guests["First Name"].toLowerCase().includes("spouse") ||
@@ -61,6 +65,8 @@ module.exports = {
       })
       .then(async () => {
         await getGuests().then(async guests => {
+          console.log("Importing Guests")
+
           await queryInterface.bulkInsert('Guests', guests, {});
           console.log("Imported Guests")
         })

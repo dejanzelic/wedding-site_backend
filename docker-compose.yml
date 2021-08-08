@@ -18,6 +18,11 @@ services:
     env_file: .env
     volumes: 
       - ./app/logs:/app/logs
+    healthcheck:
+      test: wget --quiet --spider --tries=1 http://localhost:3000/v1/healthcheck || exit 1
+      interval: 30s
+      timeout: 5s
+      retries: 3
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.backend.rule=PathPrefix(`/v1/`)"

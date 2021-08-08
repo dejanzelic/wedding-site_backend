@@ -41,8 +41,6 @@ services:
       - ./swagger.yml:/swagger.yml
     environment: 
       - SWAGGER_FILE=/swagger.yml
-    ports: 
-      - 8085:8080
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.swagger.rule=PathPrefix(`/swagger/`,`/swagger.yml`)"
